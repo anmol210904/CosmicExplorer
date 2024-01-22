@@ -2,33 +2,154 @@ package com.example.cosmicexplorar.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.SearchView
+import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cosmicexplorar.R
 import com.example.cosmicexplorar.adapters.apod_adapter
 import com.example.cosmicexplorar.apiClasses.apod
 import com.example.cosmicexplorar.databinding.ActivityApodactivityBinding
+import com.example.cosmicexplorar.viewModel.APODActivityViewModel
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class APODActivity : AppCompatActivity() {
     val binding by lazy {
         ActivityApodactivityBinding.inflate(layoutInflater)
     }
+    lateinit var list1 : ArrayList<apod>
+    lateinit var apodList: ArrayList<apod>
+    lateinit var date : String
     private lateinit var adapter: apod_adapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        var apodList = arrayListOf<apod>() // ... (initialize your list)
-        apodList.add(apod( "2024-01-21",
-             "Yes, but can your blizzard do this? In the Upper Peninsula of Michigan's Storm of the Century in 1938, some snow drifts reached the level of utility poles. Nearly a meter of new and unexpected snow fell over two days in a storm that started 86 years ago this week.  As snow fell and gale-force winds piled snow to surreal heights, many roads became not only impassable but unplowable; people became stranded, cars, school buses and a train became mired, and even a dangerous fire raged. Two people were killed and some students were forced to spend several consecutive days at school.  The featured image was taken by a local resident soon after the storm. Although all of this snow eventually melted, repeated snow storms like this help build lasting glaciers in snowy regions of our planet Earth.",
-         "https://apod.nasa.gov/apod/image/2401/snowpoles_brinkman_960.jpg",
-         "image",
-         "v1",
-        "The Upper Michigan Blizzard of 1938",
-         "https://apod.nasa.gov/apod/image/2401/snowpoles_brinkman_960.jpg"))
+        date = "";
+        apodList = arrayListOf<apod>()
+        loadintoadapter(date);
 
-        adapter = apod_adapter(this, apodList)
 
-       binding.rcv.layoutManager = LinearLayoutManager(this)
-        binding.rcv.adapter = adapter
+        binding.seachbar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                    val input = newText.toString()
+                    searchviewload(input)
+                return false
+            }
+
+        })
+
+        binding.floatingActionButton.setOnClickListener{
+            datepicker()
+        }
+
     }
+
+
+    fun loadintoadapter(date : String) {
+        apodList.clear()
+        list1 = arrayListOf()
+        if(date != ""){
+            Firebase.firestore.collection("apod")
+
+                .orderBy("date", Query.Direction.DESCENDING)
+                .whereEqualTo("date",date)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    for (document in querySnapshot.documents) {
+                        val temp = document.toObject(apod::class.java)
+                        if (temp != null) {
+                            apodList.add(temp)
+                            list1.add(temp)
+                        }
+                    }
+                    // Initialize or update the adapter here
+                    adapter = apod_adapter(this, list1)
+                    binding.rcv.layoutManager = LinearLayoutManager(this)
+                    binding.rcv.adapter = adapter
+                }.addOnFailureListener { exception ->
+                    // Handle failure if needed
+                    Log.e("tag", "Error fetching data: $exception")
+                }
+        }
+        if(date == ""){
+            Firebase.firestore.collection("apod")
+
+                .orderBy("date", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    for (document in querySnapshot.documents) {
+                        val temp = document.toObject(apod::class.java)
+                        if (temp != null) {
+                            apodList.add(temp)
+                            list1.add(temp)
+                        }
+                    }
+                    // Initialize or update the adapter here
+                    adapter = apod_adapter(this, list1)
+                    binding.rcv.layoutManager = LinearLayoutManager(this)
+                    binding.rcv.adapter = adapter
+                }.addOnFailureListener { exception ->
+                    // Handle failure if needed
+                    Log.e("tag", "Error fetching data: $exception")
+                }
+        }
+    }
+
+    fun searchviewload(input: String) {
+        list1.clear()
+        val input1 = input.lowercase()
+        for(i in apodList){
+            val title = i.title.lowercase()
+            if(title.contains(input1)){
+                list1.add(i);
+            }
+        }
+
+        adapter.notifyDataSetChanged()
+
+    }
+
+    fun datepicker(){
+        val datePicker = MaterialDatePicker.Builder.datePicker().build()
+        datePicker.show(supportFragmentManager, "DatePicker")
+
+        // Setting up the event for when ok is clicked
+        datePicker.addOnPositiveButtonClickListener {
+            // formatting date in dd-mm-yyyy format.
+            val dateFormatter = SimpleDateFormat("YYYY-MM-DD")
+
+            date = dateFormatter.format(Date(it))
+            loadintoadapter(date);
+
+        }
+
+        // Setting up the event for when cancelled is clicked
+        datePicker.addOnNegativeButtonClickListener {
+            Toast.makeText(this, "${datePicker.headerText} is cancelled", Toast.LENGTH_LONG).show()
+            loadintoadapter("")
+        }
+
+        // Setting up the event for when back button is pressed
+        datePicker.addOnCancelListener {
+//            Toast.makeText(this, "Date Picker Cancelled", Toast.LENGTH_LONG).show()
+            loadintoadapter("")
+        }
+    }
+
+
 }
+
