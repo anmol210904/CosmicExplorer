@@ -3,6 +3,7 @@ package com.example.cosmicexplorar.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -37,7 +38,7 @@ class APODActivity : AppCompatActivity() {
         date = "";
         apodList = arrayListOf<apod>()
         loadintoadapter(date);
-
+        loadingbar("start")
 
         binding.seachbar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -76,6 +77,7 @@ class APODActivity : AppCompatActivity() {
                             list1.add(temp)
                         }
                     }
+                    loadingbar("end")
                     // Initialize or update the adapter here
                     adapter = apod_adapter(this, list1)
                     binding.rcv.layoutManager = LinearLayoutManager(this)
@@ -98,6 +100,7 @@ class APODActivity : AppCompatActivity() {
                             list1.add(temp)
                         }
                     }
+                    loadingbar("end")
                     // Initialize or update the adapter here
                     adapter = apod_adapter(this, list1)
                     binding.rcv.layoutManager = LinearLayoutManager(this)
@@ -124,6 +127,7 @@ class APODActivity : AppCompatActivity() {
     }
 
     fun datepicker(){
+        loadingbar("start")
         val datePicker = MaterialDatePicker.Builder.datePicker().build()
         datePicker.show(supportFragmentManager, "DatePicker")
 
@@ -134,6 +138,7 @@ class APODActivity : AppCompatActivity() {
 
             date = dateFormatter.format(Date(it))
             loadintoadapter(date);
+            loadingbar("end")
 
         }
 
@@ -141,12 +146,27 @@ class APODActivity : AppCompatActivity() {
         datePicker.addOnNegativeButtonClickListener {
             Toast.makeText(this, "${datePicker.headerText} is cancelled", Toast.LENGTH_LONG).show()
             loadintoadapter("")
+//            loadingbar("end")
         }
 
         // Setting up the event for when back button is pressed
         datePicker.addOnCancelListener {
 //            Toast.makeText(this, "Date Picker Cancelled", Toast.LENGTH_LONG).show()
             loadintoadapter("")
+            loadingbar("end")
+        }
+    }
+
+    fun loadingbar(input : String){
+        if(input == "start"){
+            binding.rcv.visibility = View.GONE
+            binding.floatingActionButton.visibility = View.GONE
+//            binding.loading.visibility = View.VISIBLE
+        }
+        else if(input == "end"){
+            binding.rcv.visibility = View.VISIBLE
+            binding.floatingActionButton.visibility = View.VISIBLE
+//            binding.loading.visibility = View.GONE
         }
     }
 
