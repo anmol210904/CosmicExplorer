@@ -4,53 +4,75 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import com.example.cosmicexplorar.apiClasses.apod
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class repository {
 
-//    fun getFirebaseDocument(collection: String): ArrayList<apod> {
-//        var list: ArrayList<apod> = arrayListOf();
-//        Firebase.firestore.collection(collection).get().addOnSuccessListener {
-//
-//            for (i in it.documents) {
-//                val data: apod? = i.toObject(apod::class.java)
-//                if (data != null) {
-//                    list.add(data)
-//                };
-//            }
-//
-//        }
-//        Log.e("anmol", list.isEmpty().toString(), )
-//        return list
-//    }
+    suspend fun getDataFromFirebase(collection: String): ArrayList<apod> {
 
-    fun getFirebaseDocument(collection: String, callback: (ArrayList<apod>) -> Unit) {
-        var list: ArrayList<apod> = arrayListOf()
-
-        Firebase.firestore.collection(collection).get().addOnSuccessListener { querySnapshot ->
-            for (i in querySnapshot.documents) {
-                val data: apod? = i.toObject(apod::class.java)
-                if (data != null) {
-                    list.add(data)
+        var list = arrayListOf<apod>()
+        val job = CoroutineScope(Dispatchers.Main).launch {
+            val job1 = Firebase.firestore.collection(collection)
+                .orderBy("date",Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener {
+                    for (i in it.documents) {
+                        val temp = i.toObject(apod::class.java)
+                        if (temp != null) {
+                            list.add(temp)
+                        };
+                    }
                 }
-            }
+            job1.await()
 
-            Log.e("anmol", list.isEmpty().toString())
-            callback(list)
-        }.addOnFailureListener {
-            // Handle failure if needed
-            Log.e("anmol", "Error fetching data: $it")
-            callback(ArrayList()) // or callback(null) depending on your needs
         }
+
+        job.join()
+
+        return list;
+    }
+
+
+
+    suspend fun getDataFromFirebase(collection: String , date : String): ArrayList<apod> {
+        var list = arrayListOf<apod>()
+        val job = CoroutineScope(Dispatchers.Main).launch {
+            val job1 = Firebase.firestore.collection(collection)
+                .whereEqualTo("date",date)
+                .get()
+                .addOnSuccessListener {
+                    for (i in it.documents) {
+                        val temp = i.toObject(apod::class.java)
+                        if (temp != null) {
+                            list.add(temp)
+                        };
+                    }
+                }
+            job1.await()
+
+        }
+
+        job.join()
+
+        return list;
     }
 
 }
+

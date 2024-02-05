@@ -11,26 +11,31 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlin.math.log
 
 class APODActivityViewModel(application: Application) : AndroidViewModel(application) {
-//
-    lateinit var list : ArrayList<apod>
-    init{
-        list = arrayListOf()
-        Firebase.firestore.collection("apod").get().addOnSuccessListener {
-            if(!it.isEmpty){
-                for(i in it.documents){
-                    val temp = i.toObject(apod :: class.java)
-                    if (temp != null) {
-                        list.add(temp)
-                    }
-                }
-            }
-        }
+    lateinit var list1 : ArrayList<apod>
+    init {
+        list1 = arrayListOf();
     }
+    suspend fun getData(date : String ): ArrayList<apod> {
+        val job = CoroutineScope(Dispatchers.IO).async {
+            var list : ArrayList<apod> = arrayListOf();
+            if(date == ""){
+                list.addAll(repository().getDataFromFirebase("apod"))
 
-    fun getdata(): ArrayList<apod> {
-        return list;
+
+            }
+            else{
+                list.addAll(repository().getDataFromFirebase("apod",date))
+            }
+            list
+        }
+        Log.d("final tag", "getData: ${job.await().size}")
+        return job.await();
     }
 
 }

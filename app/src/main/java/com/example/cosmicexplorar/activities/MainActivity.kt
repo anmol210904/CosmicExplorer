@@ -15,7 +15,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.textView.setOnClickListener{
-            startActivity(Intent(this,APODActivity :: class.java))
+            startActivity(Intent(this,EARTHActivity :: class.java))
+        }
+
+        binding.textView2.setOnClickListener{
+            startActivity(Intent(this,APODActivity::class.java))
         }
     }
 }
