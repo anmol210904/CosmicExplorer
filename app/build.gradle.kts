@@ -61,5 +61,10 @@ dependencies {
     // corutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
+    val lifecycle_version = "2.7.0"
 
+    // ViewModel
+    implementation ("androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version")
+    // LiveData
+    implementation ("androidx.lifecycle:lifecycle-livedata:$lifecycle_version")
 }

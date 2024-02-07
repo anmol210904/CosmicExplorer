@@ -14,28 +14,38 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.log
 
 class APODActivityViewModel(application: Application) : AndroidViewModel(application) {
-    lateinit var list1 : ArrayList<apod>
+    lateinit var list : ArrayList<apod>
     init {
-        list1 = arrayListOf();
+        list = arrayListOf()
     }
     suspend fun getData(date : String ): ArrayList<apod> {
-        val job = CoroutineScope(Dispatchers.IO).async {
-            var list : ArrayList<apod> = arrayListOf();
-            if(date == ""){
-                list.addAll(repository().getDataFromFirebase("apod"))
+        if(list.size != 0){
 
+            return list;
 
-            }
-            else{
-                list.addAll(repository().getDataFromFirebase("apod",date))
-            }
-            list
         }
-        Log.d("final tag", "getData: ${job.await().size}")
-        return job.await();
+        else{
+
+            val job = CoroutineScope(Dispatchers.IO).async {
+
+                if(date == ""){
+                    list.addAll(repository().getDataFromFirebase("apod"))
+
+
+                }
+                else{
+                    list.addAll(repository().getDataFromFirebase("apod",date))
+                }
+                list
+            }
+
+            return job.await();
+        }
     }
 
 }
