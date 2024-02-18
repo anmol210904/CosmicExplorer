@@ -67,4 +67,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version")
     // LiveData
     implementation ("androidx.lifecycle:lifecycle-livedata:$lifecycle_version")
+
+    //date picker
+    implementation("com.github.salahamassi:android-mask-date-editText:v1.02")
 }

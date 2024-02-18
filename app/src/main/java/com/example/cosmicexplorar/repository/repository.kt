@@ -81,7 +81,7 @@ class EarthRepository(private val nasaApiInterface: NasaApiInterface){
         val result = nasaApiInterface.getEarthData(lon, lat , date);
         Log.d("TAG23", "onCreate:3 ")
         if(result.body() !=  null){
-            Log.d("TAG23", "onCreate: ")
+            Log.d("TAG23", "onCreate: ${result.body()!!.url} ")
             earthLiveData.postValue(result.body())
         }
         else{

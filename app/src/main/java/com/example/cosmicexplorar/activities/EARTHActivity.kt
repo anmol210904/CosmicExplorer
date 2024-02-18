@@ -35,7 +35,8 @@ class EARTHActivity : AppCompatActivity() {
         val earthservices = RetrofitHelper.getInstance().create(NasaApiInterface :: class.java)
         val repository = EarthRepository(earthservices)
         earthViewModel = ViewModelProvider(this,EarthViewModelFactory(repository)).get(EarthViewModel::class.java)
-        
+
+        binding.dateEditText.listen()
 
 
 
@@ -43,8 +44,12 @@ class EARTHActivity : AppCompatActivity() {
             // Get user-entered values using View Binding
             val lat = binding.latitude.text.toString()
             val lon = binding.longitude.text.toString()
+            var date = binding.dateEditText.text.toString()
 
-            earthViewModel.getData(lat,lon,"2014-01-02");
+            date = changeDateFormat(date)
+
+            Log.d("TAG", "onCreate: $date")
+            earthViewModel.getData(lat,lon,date);
             earthViewModel.earthData.observe(this, Observer {
                 Log.d("TAG24", "onCreate: ")
                 binding.imageView.load(it.url)
@@ -58,5 +63,15 @@ class EARTHActivity : AppCompatActivity() {
 
 
     // date picker
+    fun changeDateFormat(inputDate: String): String {
+        val parts = inputDate.split("-")
+
+        val day = parts[0]
+        val month = parts[1]
+        val year = parts[2]
+
+        // Reformat the date
+        return "$year-$month-$day"
+    }
 
 }
