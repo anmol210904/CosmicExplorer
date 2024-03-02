@@ -6,24 +6,35 @@
     android:background="#D1EEB5"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/apodButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="240dp"
-        android:text="TextView"
+        android:layout_marginTop="108dp"
+        android:text="APOD"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView2"
+    <Button
+        android:id="@+id/earth_engine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="324dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="56dp"
+        android:text="Earth Engine"
+        app:layout_constraintEnd_toEndOf="@+id/apodButton"
+        app:layout_constraintStart_toStartOf="@+id/apodButton"
+        app:layout_constraintTop_toBottomOf="@+id/apodButton" />
+
+    <Button
+        android:id="@+id/mars_photos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:text="Mars Rover Photos"
+        app:layout_constraintEnd_toEndOf="@+id/earth_engine"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="@+id/earth_engine"
+        app:layout_constraintTop_toBottomOf="@+id/earth_engine" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

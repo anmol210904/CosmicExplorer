@@ -14,12 +14,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.textView.setOnClickListener{
+        binding.earthEngine.setOnClickListener{
             startActivity(Intent(this,EARTHActivity :: class.java))
         }
 
-        binding.textView2.setOnClickListener{
+        binding.apodButton.setOnClickListener{
             startActivity(Intent(this,APODActivity::class.java))
+        }
+
+        binding.marsPhotos.setOnClickListener{
+            startActivity(Intent(this, MarsRoverPhotos :: class.java))
         }
     }
 }

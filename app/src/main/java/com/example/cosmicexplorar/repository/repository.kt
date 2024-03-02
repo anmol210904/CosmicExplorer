@@ -7,6 +7,7 @@ import com.example.cosmicexplorar.apiClasses.apod
 import com.example.cosmicexplorar.API.NasaApiInterface
 import com.example.cosmicexplorar.API.RetrofitHelper
 import com.example.cosmicexplorar.apiClasses.earth
+import com.example.cosmicexplorar.apiClasses.marsPhotos.marsPhotos
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.log
 
 class repository() {
 
@@ -28,7 +30,11 @@ class repository() {
                 .get()
                 .addOnSuccessListener {
                     for (i in it.documents) {
+
                         val temp = i.toObject(apod::class.java)
+                        if (temp != null) {
+                            Log.d("tag", "getDataFromFirebase:${temp.date} ")
+                        }
                         if (temp != null) {
                             list.add(temp)
                         };
@@ -88,6 +94,21 @@ class EarthRepository(private val nasaApiInterface: NasaApiInterface){
             Log.d("TAG23", "onCreate:1 ")
         }
     }
+}
+
+class MarsPhotosRepository(private val nasaApiInterface: NasaApiInterface){
+    private val marsPhotosLiveData = MutableLiveData<marsPhotos>()
+
+    val marsPhotosData : LiveData<marsPhotos>
+        get() = marsPhotosLiveData
+
+    suspend fun getData(date : String){
+        val result = nasaApiInterface.getMarsPhotosData(date);
+        if(result.body() != null){
+            marsPhotosLiveData.postValue(result.body())
+        }
+    }
+
 }
 
 

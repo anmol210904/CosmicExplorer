@@ -15,6 +15,9 @@
         android:theme="@style/Theme.CosmicExplorar"
         tools:targetApi="31">
         <activity
+            android:name=".activities.MarsRoverPhotos"
+            android:exported="false" />
+        <activity
             android:name=".activities.EARTHActivity"
             android:exported="false" />
         <activity
